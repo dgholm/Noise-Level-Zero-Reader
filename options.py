@@ -9,21 +9,22 @@ class Options:
         self.parent = parent
         self.root = tkinter.Tk()
         self.root.title('BIXjoe Options')
+        self.AutomaticWho = StringVar()
         self.BlackHoleListEntries = []
         self.BlackHoleList = StringVar()
         self.BrowserPath = StringVar()
-        self.BrowserPath.set('C:/Program Files (x86)/Mozilla Firefox/firefox.exe')
+        self.EchoInput = StringVar()
+        self.EchoOutput = StringVar()
         self.HostName = StringVar()
-        self.KeepAlive = StringVar()
-        self.KeepAlive.set('1')
         self.LoginName = StringVar()
         self.LoginPassword = StringVar()
+        self.KeepAlive = StringVar()
         self.MailerPath = StringVar()
         self.NewBlackHoleEntry = StringVar()
         self.ReadMode = StringVar()
-        self.ReadMode.set('reference')
         self.SystemType = StringVar()
-        self.SystemType.set('NLZ')
+        self.TraceEvents = StringVar()
+        self.WordWrapAt72 = StringVar()
         self.left_width = 0
         self.min_left_width = 23
         self.right_width = 31
@@ -62,27 +63,27 @@ class Options:
 
         self.label7 = ttk.Label(self.root, text='', width=self.left_width)
         self.label7.grid(column=0, row=6, sticky='e')
-        self.widget7 = ttk.Checkbutton(self.root, text='Automatic Who', variable=self.KeepAlive, width=self.right_width)
+        self.widget7 = ttk.Checkbutton(self.root, text='Automatic Who', variable=self.AutomaticWho, width=self.right_width)
         self.widget7.grid(column=1, row=6, sticky='w')
 
         self.label8 = ttk.Label(self.root, text='', width=self.left_width)
         self.label8.grid(column=0, row=7, sticky='e')
-        self.widget8 = ttk.Checkbutton(self.root, text='Echo Input', variable=self.KeepAlive, width=self.right_width)
+        self.widget8 = ttk.Checkbutton(self.root, text='Echo Input', variable=self.EchoInput, width=self.right_width)
         self.widget8.grid(column=1, row=7, sticky='w')
 
         self.label9 = ttk.Label(self.root, text='', width=self.left_width)
         self.label9.grid(column=0, row=8, sticky='e')
-        self.widget9 = ttk.Checkbutton(self.root, text='Echo Output', variable=self.KeepAlive, width=self.right_width)
+        self.widget9 = ttk.Checkbutton(self.root, text='Echo Output', variable=self.EchoOutput, width=self.right_width)
         self.widget9.grid(column=1, row=8, sticky='w')
 
         self.label10 = ttk.Label(self.root, text='', width=self.left_width)
         self.label10.grid(column=0, row=9, sticky='e')
-        self.widget10 = ttk.Checkbutton(self.root, text='Trace Events', variable=self.KeepAlive, width=self.right_width)
+        self.widget10 = ttk.Checkbutton(self.root, text='Trace Events', variable=self.TraceEvents, width=self.right_width)
         self.widget10.grid(column=1, row=9, sticky='w')
 
         self.label11 = ttk.Label(self.root, text='', width=self.left_width)
         self.label11.grid(column=0, row=10, sticky='e')
-        self.widget11 = ttk.Checkbutton(self.root, text='Word Wrap at 72', variable=self.KeepAlive, width=self.right_width)
+        self.widget11 = ttk.Checkbutton(self.root, text='Word Wrap at 72', variable=self.WordWrapAt72, width=self.right_width)
         self.widget11.grid(column=1, row=10, sticky='w')
 
         self.label12 = ttk.Label(self.root, text='Browser Path ', width=self.left_width)
