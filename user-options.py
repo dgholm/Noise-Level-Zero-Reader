@@ -21,59 +21,65 @@ class Option:
 
 class UserOptions:
     def __init__(self):
-        self.options = []
+        options = []
         self.AutomaticWho = Option(
             'Automatic Who', 'boolean', None, '0')
-        self.options.append(self.AutomaticWho)
+        options.append(self.AutomaticWho)
         self.BlackHoleList = Option(
             'Black Hole List', 'list', None, [])
-        self.options.append(self.BlackHoleList)
+        options.append(self.BlackHoleList)
         self.BrowserPath = Option(
             'Browser Path', 'string', None, '')
-        self.options.append(self.BrowserPath)
+        options.append(self.BrowserPath)
         self.EchoInput = Option(
             'Echo Input', 'boolean', None, '0')
-        self.options.append(self.EchoInput)
+        options.append(self.EchoInput)
         self.EchoOutput = Option(
             'Echo Output', 'boolean', None, '0')
-        self.options.append(self.EchoOutput)
+        options.append(self.EchoOutput)
         self.HostName = Option(
             'Host Name', 'string', None, '')
-        self.options.append(self.HostName)
+        options.append(self.HostName)
         self.LoginName = Option(
             'Login Name', 'string', None, '')
-        self.options.append(self.LoginName)
+        options.append(self.LoginName)
         self.LoginPassword = Option(
             'Login Password', 'password', None, '')
-        self.options.append(self.LoginPassword)
+        options.append(self.LoginPassword)
         self.KeepAlive = Option(
             'Keep Alive', 'boolean', None, '0')
-        self.options.append(self.KeepAlive)
+        options.append(self.KeepAlive)
         self.MailerPath = Option(
             'Mailer Path', 'string', None, '')
-        self.options.append(self.MailerPath)
+        options.append(self.MailerPath)
         self.ReadMode = Option(
             'Read Mode', 'choice', ['backward', 'forward', 'reference'], '')
-        self.options.append(self.ReadMode)
+        options.append(self.ReadMode)
         self.SystemType = Option(
             'System Type', 'choice', ['NLZ', 'other', 'test'], '')
-        self.options.append(self.SystemType)
+        options.append(self.SystemType)
         self.TraceEvents = Option(
             'Trace Events', 'boolean', None, '0')
-        self.options.append(self.TraceEvents)
+        options.append(self.TraceEvents)
         self.WordWrapAt72 = Option(
             'Word Wrap At 72', 'boolean', None, '1')
-        self.options.append(self.WordWrapAt72)
+        options.append(self.WordWrapAt72)
+
+        self.Options = {}
+        for option in options:
+            self.Options[option.Name] = option
+
+        del options
 
     def __str__(self):
         first = True
         text = '['
-        for option in self.options:
+        for name in self.Options:
             if first:
                 first = False
             else:
                 text += ', '
-            text += str(option)
+            text += str(self.Options[name])
         text += ']'
         return text
 
