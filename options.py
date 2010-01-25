@@ -3,31 +3,46 @@
 import tkinter
 from tkinter import ttk
 from tkinter import StringVar
+from user_options import UserOptions
 
 class Options:
-    def __init__(self, parent):
+    def __init__(self, parent, user):
         self.parent = parent
         self.root = tkinter.Tk()
         self.root.title('BIXjoe Options')
         self.AutomaticWho = StringVar()
-        self.BlackHoleListEntries = []
+        self.AutomaticWho.set(user.Options['Automatic Who'].Value)
+        self.BlackHoleListEntries = user.Options['Black Hole List'].Value
         self.BlackHoleList = StringVar()
         self.BrowserPath = StringVar()
+        self.BrowserPath.set(user.Options['Browser Path'].Value)
         self.EchoInput = StringVar()
+        self.EchoInput.set(user.Options['Echo Input'].Value)
         self.EchoOutput = StringVar()
+        self.EchoOutput.set(user.Options['Echo Output'].Value)
         self.HostName = StringVar()
+        self.HostName.set(user.Options['Host Name'].Value)
         self.LoginName = StringVar()
+        self.LoginName.set(user.Options['Login Name'].Value)
         self.LoginPassword = StringVar()
+        self.LoginPassword.set(user.Options['Login Password'].Value)
         self.KeepAlive = StringVar()
+        self.KeepAlive.set(user.Options['Keep Alive'].Value)
         self.MailerPath = StringVar()
+        self.MailerPath.set(user.Options['Mailer Path'].Value)
         self.NewBlackHoleEntry = StringVar()
         self.ReadMode = StringVar()
+        self.ReadMode.set(user.Options['Read Mode'].Value)
         self.SystemType = StringVar()
+        self.SystemType.set(user.Options['System Type'].Value)
         self.TraceEvents = StringVar()
+        self.TraceEvents.set(user.Options['Trace Events'].Value)
         self.WordWrapAt72 = StringVar()
+        self.WordWrapAt72.set(user.Options['Word Wrap At 72'].Value)
         self.left_width = 0
         self.min_left_width = 23
         self.right_width = 31
+        self.user_options = user
         self.init_widgets()
 
     def init_widgets(self):
@@ -122,5 +137,7 @@ class Options:
         self.widget18c.grid(column=1, row=17, sticky='e')
 
 if __name__ == '__main__':
-    opt = Options(None)
+    user = UserOptions()
+    print(user.Options['Automatic Who'].Value)
+    opt = Options(None, user)
     opt.root.mainloop()
