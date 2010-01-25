@@ -42,13 +42,13 @@ class Options:
         self.left_width = 0
         self.min_left_width = 23
         self.right_width = 31
-        self.user_options = user
+        self.user = user
         self.init_widgets()
 
     def init_widgets(self):
         self.label1 = ttk.Label(self.root, text='System Type ', width=0)
         self.label1.grid(column=0, row=0, sticky='e')
-        self.widget1 = ttk.Combobox(self.root, textvariable=self.SystemType, width=self.right_width, values=['NLZ', 'Test'])
+        self.widget1 = ttk.Combobox(self.root, textvariable=self.SystemType, width=self.right_width, values=self.user.Options['System Type'].Choices)
         self.widget1.grid(column=1, row=0, sticky='w')
 
         self.label2 = ttk.Label(self.root, text='Host Name ', width=self.left_width)
@@ -68,7 +68,7 @@ class Options:
 
         self.label5 = ttk.Label(self.root, text='Read Mode ', width=self.left_width)
         self.label5.grid(column=0, row=4, sticky='e')
-        self.widget5 = ttk.Combobox(self.root, textvariable=self.ReadMode, width=self.right_width, values=['reference', 'forward', 'backward'])
+        self.widget5 = ttk.Combobox(self.root, textvariable=self.ReadMode, width=self.right_width, values=self.user.Options['Read Mode'].Choices)
         self.widget5.grid(column=1, row=4, sticky='w')
 
         self.label6 = ttk.Label(self.root, text='', width=self.left_width)
@@ -113,7 +113,7 @@ class Options:
 
         self.label14 = ttk.Label(self.root, text='Black Hole List ', width=self.left_width)
         self.label14.grid(column=0, row=13, sticky='e')
-        self.widget14 = ttk.Combobox(self.root, textvariable=self.BlackHoleList, width=self.right_width, values=self.BlackHoleListEntries)
+        self.widget14 = ttk.Combobox(self.root, textvariable=self.BlackHoleList, width=self.right_width, values=self.user.Options['Black Hole List'].Value)
         self.widget14.grid(column=1, row=13, sticky='w')
 
         self.label15 = ttk.Label(self.root, text='New Black Hole Entry ', width=self.left_width)
