@@ -11,34 +11,34 @@ class Options:
         self.root = tkinter.Tk()
         self.root.title('BIXjoe Options')
         self.AutomaticWho = StringVar()
-        self.AutomaticWho.set(user.Options['Automatic Who'].Value)
-        self.BlackHoleListEntries = user.Options['Black Hole List'].Value
+        self.AutomaticWho.set(user.AutomaticWho.Value)
+        self.BlackHoleListEntries = user.BlackHoleList.Value
         self.BlackHoleList = StringVar()
         self.BrowserPath = StringVar()
-        self.BrowserPath.set(user.Options['Browser Path'].Value)
+        self.BrowserPath.set(user.BrowserPath.Value)
         self.EchoInput = StringVar()
-        self.EchoInput.set(user.Options['Echo Input'].Value)
+        self.EchoInput.set(user.EchoInput.Value)
         self.EchoOutput = StringVar()
-        self.EchoOutput.set(user.Options['Echo Output'].Value)
+        self.EchoOutput.set(user.EchoOutput.Value)
         self.HostName = StringVar()
-        self.HostName.set(user.Options['Host Name'].Value)
+        self.HostName.set(user.HostName.Value)
         self.LoginName = StringVar()
-        self.LoginName.set(user.Options['Login Name'].Value)
+        self.LoginName.set(user.LoginName.Value)
         self.LoginPassword = StringVar()
-        self.LoginPassword.set(user.Options['Login Password'].Value)
+        self.LoginPassword.set(user.LoginPassword.Value)
         self.KeepAlive = StringVar()
-        self.KeepAlive.set(user.Options['Keep Alive'].Value)
+        self.KeepAlive.set(user.KeepAlive.Value)
         self.MailerPath = StringVar()
-        self.MailerPath.set(user.Options['Mailer Path'].Value)
+        self.MailerPath.set(user.MailerPath.Value)
         self.NewBlackHoleEntry = StringVar()
         self.ReadMode = StringVar()
-        self.ReadMode.set(user.Options['Read Mode'].Value)
+        self.ReadMode.set(user.ReadMode.Value)
         self.SystemType = StringVar()
-        self.SystemType.set(user.Options['System Type'].Value)
+        self.SystemType.set(user.SystemType.Value)
         self.TraceEvents = StringVar()
-        self.TraceEvents.set(user.Options['Trace Events'].Value)
+        self.TraceEvents.set(user.TraceEvents.Value)
         self.WordWrapAt72 = StringVar()
-        self.WordWrapAt72.set(user.Options['Word Wrap At 72'].Value)
+        self.WordWrapAt72.set(user.WordWrapAt72.Value)
         self.left_width = 0
         self.min_left_width = 23
         self.right_width = 31
@@ -48,7 +48,7 @@ class Options:
     def init_widgets(self):
         self.label1 = ttk.Label(self.root, text='System Type ', width=0)
         self.label1.grid(column=0, row=0, sticky='e')
-        self.widget1 = ttk.Combobox(self.root, textvariable=self.SystemType, width=self.right_width, values=self.user.Options['System Type'].Choices)
+        self.widget1 = ttk.Combobox(self.root, textvariable=self.SystemType, width=self.right_width, values=self.user.SystemType.Choices)
         self.widget1.grid(column=1, row=0, sticky='w')
 
         self.label2 = ttk.Label(self.root, text='Host Name ', width=self.left_width)
@@ -68,7 +68,7 @@ class Options:
 
         self.label5 = ttk.Label(self.root, text='Read Mode ', width=self.left_width)
         self.label5.grid(column=0, row=4, sticky='e')
-        self.widget5 = ttk.Combobox(self.root, textvariable=self.ReadMode, width=self.right_width, values=self.user.Options['Read Mode'].Choices)
+        self.widget5 = ttk.Combobox(self.root, textvariable=self.ReadMode, width=self.right_width, values=self.user.ReadMode.Choices)
         self.widget5.grid(column=1, row=4, sticky='w')
 
         self.label6 = ttk.Label(self.root, text='', width=self.left_width)
@@ -113,7 +113,7 @@ class Options:
 
         self.label14 = ttk.Label(self.root, text='Black Hole List ', width=self.left_width)
         self.label14.grid(column=0, row=13, sticky='e')
-        self.widget14 = ttk.Combobox(self.root, textvariable=self.BlackHoleList, width=self.right_width, values=self.user.Options['Black Hole List'].Value)
+        self.widget14 = ttk.Combobox(self.root, textvariable=self.BlackHoleList, width=self.right_width, values=self.user.BlackHoleList.Value)
         self.widget14.grid(column=1, row=13, sticky='w')
 
         self.label15 = ttk.Label(self.root, text='New Black Hole Entry ', width=self.left_width)
@@ -138,6 +138,5 @@ class Options:
 
 if __name__ == '__main__':
     user = UserOptions()
-    print(user.Options['Automatic Who'].Value)
     opt = Options(None, user)
     opt.root.mainloop()

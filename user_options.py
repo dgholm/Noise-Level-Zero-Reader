@@ -65,21 +65,17 @@ class UserOptions:
             'Word Wrap At 72', 'boolean', None, '1')
         options.append(self.WordWrapAt72)
 
-        self.Options = {}
-        for option in options:
-            self.Options[option.Name] = option
-
-        del options
+        self._options = options
 
     def __str__(self):
         first = True
         text = '['
-        for name in self.Options:
+        for option in self._options:
             if first:
                 first = False
             else:
                 text += ', '
-            text += str(self.Options[name])
+            text += str(option)
         text += ']'
         return text
 
