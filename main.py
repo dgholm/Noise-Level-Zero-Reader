@@ -14,6 +14,7 @@ class Main:
         self.connected = False
         self.logged_in = False
         self.blink = False
+        self.cur_len = 0
         self.pw = False
         self.root = tkinter.Tk()
         self.root.title('BIXpy')
@@ -31,6 +32,7 @@ class Main:
         self.user = UserOptions()
         self.user.read('UserOptions')
         self.telnet = None
+        self.wrap_chars = ' ,;:/\\]})=-+'
         self.root.mainloop()
 
     def init_widgets(self):
@@ -78,22 +80,55 @@ class Main:
 
     def send_text(self, event = None):
         if self.telnet and self.connected:
-            text = self.Text.get()
-            if self.blink:
-                text += ';;-BLINK\r\n'
-                self.blink = False
-            try:
-                self.telnet.write(text.encode('ascii') + b'\r\n')
-            except EOFError:
-                self.show_disconnected()
-                return
-            self.Text.set('')
-            if self.pw:
-                text = b'*\r\n'
-                self.append(text)
-                self.pw = False
-            if self.user.Echo_Output.Value:
-                print('-->', text)
+            line = self.Text.get()
+            org_len = len(line) + self.cur_len
+            print('len(line)', len(line))
+            print('self.cur_len', self.cur_len)
+            print('org_len', org_len)
+            first_time = True
+            while first_time or len(line) > 0:
+                first_time = False
+                if len(line) + self.cur_len > 72:
+                    print('needs wrapping')
+                    idx = 72 - self.cur_len
+                    while idx > 0 and not line[idx] in self.wrap_chars:
+                        idx -= 1
+                    if idx == 0:
+                        if self.cur_len > 0:
+                            if line[0] in self.wrap_chars:
+                                idx += 1
+                        else:
+                            idx = 72 - self.cur_len
+                    else:
+                        idx += 1
+                    print('idx', idx)
+                    text = line[0:idx] + '\r\n'
+                    line = line[idx:]
+                    self.cur_len = 0
+                else:
+                    text = line
+                    line = ''
+                    if org_len > 72:
+                        self.cur_len = len(text)
+                    else:
+                        self.cur_len = 0
+                        text += '\r\n'
+                    print ('self.cur_len', self.cur_len)
+                if self.blink:
+                    text += ';;-BLINK\r\n'
+                    self.blink = False
+                try:
+                    self.telnet.write(text.encode('ascii'))
+                except EOFError:
+                    self.show_disconnected()
+                    return
+                self.Text.set('')
+                if self.pw:
+                    text = b'*\r\n'
+                    self.append(text)
+                    self.pw = False
+                if self.user.Echo_Output.Value:
+                    print('-->', text)
 
     def process_telnet(self):
         response = ''
@@ -126,7 +161,7 @@ class Main:
                         else:
                             self.pw = True
                             self.root.initial_focus.focus_set()
-                    elif text.endswith(b'\r\n::: Ready!\r\n:'):
+                    elif text.find(b'\r\n::: Ready!') >= 0:
                         self.logged_in = True
                         self.root.initial_focus.focus_set()
                 elif text.endswith(b'\x07Are you there? \r\n'):
