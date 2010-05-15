@@ -8,7 +8,7 @@ from user_options import UserOptions
 class Options:
     def __init__(self, parent, user):
         self.parent = parent
-        self.root = tkinter.Tk()
+        self.root = tkinter.Toplevel(parent)
         self.root.title('BIXjoe Options')
         self.AutomaticWho = StringVar()
         self.AutomaticWho.set(user.AutomaticWho.Value)
@@ -133,10 +133,12 @@ class Options:
         self.widget18a.grid(column=0, row=17, sticky='w')
         self.widget18b = ttk.Button(self.root, text='Save', width=10)
         self.widget18b.grid(column=1, row=17, sticky='w')
-        self.widget18c = ttk.Button(self.root, text='Cancel', width=10)
+        self.widget18c = ttk.Button(self.root, text='Cancel', command=self.root.destroy, width=10)
         self.widget18c.grid(column=1, row=17, sticky='e')
 
 if __name__ == '__main__':
     user = UserOptions()
-    opt = Options(None, user)
-    opt.root.mainloop()
+    root = tkinter.Tk()
+    root.update()
+    opt = Options(root, user)
+    root.wait_window(opt.root)
