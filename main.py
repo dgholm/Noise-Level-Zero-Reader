@@ -70,7 +70,11 @@ class Main:
                 self.blink = False
             if self.debug:
                 print(text)
-            self.telnet.write(text.encode('ascii') + b'\r\n')
+            try:
+                self.telnet.write(text.encode('ascii') + b'\r\n')
+            except EOFError:
+                self.show_disconnected()
+                return
             self.Text.set('')
             if self.pw:
                 self.insert(b'*\r\n')
@@ -80,7 +84,12 @@ class Main:
         response = ''
         show = ''
         while self.telnet:
-            text = self.telnet.read_very_eager()
+            text = None
+            try:
+                text = self.telnet.read_very_eager()
+            except EOFError:
+                self.show_disconnected()
+                return
             if text:
                 if self.debug:
                     print(text)
@@ -105,7 +114,11 @@ class Main:
                     self.logged_in = True
                     self.root.initial_focus.focus_set()
                 if response:
-                    self.telnet.write(response)
+                    try:
+                        self.telnet.write(response)
+                    except EOFError:
+                        self.show_disconnected()
+                        return
                     response = ''
                 if show:
                     self.insert(show)
@@ -119,11 +132,14 @@ class Main:
             if self.telnet:
                 self.telnet.close()
                 self.telnet = None
-            self.insert('\nDisconnected.\n')
-            self.conn.grid(column=1, row=0, sticky='w')
-            self.disc.grid_forget()
-            self.connected = False
-            self.logged_in = False
+            show_disconnected()
+
+    def show_disconnected(self):
+        self.insert('\nDisconnected.\n')
+        self.conn.grid(column=1, row=0, sticky='w')
+        self.disc.grid_forget()
+        self.connected = False
+        self.logged_in = False
 
     def insert(self, text):
         self.txt.insert(tkinter.INSERT, text)
