@@ -11,6 +11,11 @@ class Main:
         self.root = tkinter.Tk()
         self.root.title('BIXjoe')
         self.init_widgets()
+        self.root.protocol("WM_DELETE_WINDOW", self.cancel)
+        self.root.geometry("+%d+%d" % (48, 48))
+        self.root.initial_focus = self.entry
+        self.root.initial_focus.focus_set()
+        self.root.mainloop()
 
     def init_widgets(self):
         self.user = UserOptions()
@@ -26,6 +31,10 @@ class Main:
         sb = ttk.Scrollbar(command=self.txt.yview, orient='vertical')
         sb.grid(column=3, row=1, sticky='ns')
         self.txt['yscrollcommand'] = sb.set
+
+    def cancel(self, event = None):
+        # check to see if still connected...
+        self.root.destroy()
 
     def connect(self):
         self.insert('Connecting...')
@@ -45,4 +54,3 @@ class Main:
 
 if __name__ == '__main__':
     main = Main(None)
-    main.root.mainloop()
