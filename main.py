@@ -24,6 +24,7 @@ class Main:
         self.root.initial_focus = self.entry
         self.root.initial_focus.focus_set()
         self.user = UserOptions()
+        self.user.read('BIXpyUserOptions.xml')
         self.telnet = None
         self.root.mainloop()
 
@@ -51,7 +52,7 @@ class Main:
             self.root.update()
             if self.telnet:
                 self.telnet.close()
-            host = self.user.HostName.Value
+            host = self.user.Host_Name.Value
             if not host:
                 host = 'nlzero.com'
             self.telnet = Telnet(host, 23, 60)
@@ -98,14 +99,14 @@ class Main:
                     response = b'nlz\r\n'
                     show = response
                 elif not self.logged_in and text.endswith(b'Name? '):
-                    if self.user.LoginName.Value:
-                        response = self.user.LoginName.Value.encode('ascii') + b';;-BLINK\r\n'
+                    if self.user.Login_Name.Value:
+                        response = self.user.Login_Name.Value.encode('ascii') + b';;-BLINK\r\n'
                     else:
                         self.root.initial_focus.focus_set()
                         self.blink = True
                 elif not self.logged_in and text.endswith(b'Password: '):
-                    if self.user.LoginPassword.Value:
-                        response = self.user.LoginPassword.Value.encode('ascii') + b'\r\n'
+                    if self.user.Login_Password.Value:
+                        response = self.user.Login_Password.Value.encode('ascii') + b'\r\n'
                         show = b'*\r\n'
                     else:
                         self.pw = True
