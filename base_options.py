@@ -26,7 +26,11 @@ class OptionsBase:
 
     def read(self, option_section):
         tree = ET.ElementTree()
-        tree.parse('%s%s.xml' %(self.root_tag, option_section))
+        try:
+            tree.parse('%s%s.xml' %(self.root_tag, option_section))
+        except IOError:
+            # TODO: Display a pop-up error
+            return
         root = tree.getroot()
         if self.debug:
             print(root)

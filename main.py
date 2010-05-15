@@ -4,8 +4,10 @@ import tkinter
 from tkinter import ttk
 from tkinter import StringVar
 from options import Options
+from program_options import ProgramOptions
 from user_options import UserOptions
 from telnetlib import Telnet
+import re
 
 class Main:
     def __init__(self):
@@ -19,7 +21,11 @@ class Main:
         self.Text = StringVar()
         self.init_widgets()
         self.root.protocol("WM_DELETE_WINDOW", self.cancel)
-        self.root.geometry("+%d+%d" % (48, 48))
+        self.prog = ProgramOptions()
+        self.prog.read('ProgramOptions')
+        geom = self.prog.Main_Geometry.Value
+        if geom:
+            self.root.geometry(geom)
         self.root.bind("<Return>", self.send_text)
         self.root.initial_focus = self.entry
         self.root.initial_focus.focus_set()
@@ -44,6 +50,13 @@ class Main:
 
     def cancel(self, event = None):
         self.disconnect()
+        geom = self.root.geometry()
+        m = re.match("(\d+)x(\d+)([-+]\d+)([-+]\d+)", geom)
+        if m:
+            vals = m.groups()
+            geom = "%s%s" % (vals[2], vals[3])
+            self.prog.Main_Geometry.Value = geom
+        self.prog.write('ProgramOptions')
         self.root.destroy()
 
     def connect(self):
