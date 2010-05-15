@@ -24,7 +24,7 @@ class Main:
         self.root.initial_focus = self.entry
         self.root.initial_focus.focus_set()
         self.user = UserOptions()
-        self.user.read('BIXpyUserOptions.xml')
+        self.user.read('UserOptions')
         self.telnet = None
         self.root.mainloop()
 

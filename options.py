@@ -170,7 +170,7 @@ class Options:
 
     def save(self, event = None):
         self.copy_instance_values()
-        self.user.write('BIXpyUserOptions.xml')
+        self.user.write('UserOptions')
         self.cancel()
 
     def cancel(self, event = None):

@@ -19,9 +19,79 @@ class Option:
         return '[Name=\'%s\', Node=\'%s\', Type=\'%s\', Choices=%s, Value=%s]' %(
             self.Name, self.Node, self.Type, self.Choices, value_str)
 
-class UserOptions:
+class OptionsBase:
     def __init__(self):
         self.debug = False
+        self.root_tag = 'BIXpy'
+        self._options = []
+
+    def read(self, option_section):
+        tree = ET.ElementTree()
+        tree.parse('%s%s.xml' %(self.root_tag, option_section))
+        root = tree.getroot()
+        if self.debug:
+            print(root)
+        if not root.tag == self.root_tag:
+            # TODO: Display a pop-up error
+            return
+        element = tree.find('/' + option_section)
+        if self.debug:
+            print(element)
+        if not element:
+            # TODO: Display a pop-up error
+            return
+        for option in self._options:
+            element = tree.find('/%s/%s' %(option_section, option.Node))
+            if self.debug:
+                print(element)
+                print(element.tag)
+                print(element.text)
+            if not element == None:
+                if self.debug:
+                    print(element.text)
+                if element.text:
+                    option.Value = element.text
+
+    def write(self, option_section):
+        parser = ET.TreeBuilder()
+        attr = dict()
+        attr['Version'] = '1.0'
+        parser.start(self.root_tag, attr)
+        parser.data('\r\n\t')
+        parser.start(option_section, dict())
+        parser.data('\r\n')
+        for option in self._options:
+            if self.debug:
+                print(option.Name, option.Node, option.Value)
+                print()
+            parser.data('\t\t')
+            name = option.Node
+            parser.start(name, dict())
+            parser.data(str(option.Value))
+            parser.end(name)
+            parser.data('\r\n')
+        parser.data('\t')
+        parser.end(option_section)
+        parser.data('\r\n')
+        parser.end(self.root_tag)
+        tree = ET.ElementTree(parser.close())
+        tree.write('%s%s.xml' %(self.root_tag, option_section))
+
+    def __str__(self):
+        first = True
+        text = '['
+        for option in self._options:
+            if first:
+                first = False
+            else:
+                text += ', '
+            text += str(option)
+        text += ']'
+        return text
+
+class UserOptions(OptionsBase):
+    def __init__(self):
+        OptionsBase.__init__(self)
         options = []
         self.Automatic_Who = Option(
             'Automatic Who', 'boolean', None, '0')
@@ -67,83 +137,6 @@ class UserOptions:
         options.append(self.Word_Wrap_at_72)
 
         self._options = options
-
-    def read(self, file_path):
-        tree = ET.ElementTree()
-        tree.parse(file_path)
-        root = tree.getroot()
-        if self.debug:
-            print(root)
-        if not root.tag == 'BIXpy':
-            # TODO: Display a pop-up error
-            return
-        element = tree.find('/UserOptions')
-        if self.debug:
-            print(element)
-        if not element:
-            # TODO: Display a pop-up error
-            return
-        element = tree.find('/UserOptions/Login_Name')
-        if self.debug:
-            print(element)
-            print(element.tag)
-            print(element.text)
-        if not element == None:
-            self.Login_Name.Value = element.text
-            if self.debug:
-                print(element.text)
-        element = tree.find('/UserOptions/Login_Password')
-        if self.debug:
-            print(element)
-        if not element == None:
-            self.Login_Password.Value = element.text
-            if self.debug:
-                print(element.text)
-        element = tree.find('/UserOptions/Word_Wrap_at_72')
-        if self.debug:
-            print(element)
-        if not element == None:
-            self.Word_Wrap_at_72.Value = element.text
-            if self.debug:
-                print(element.text)
-
-    def write(self, file_path):
-        parser = ET.TreeBuilder()
-        attr = dict()
-        attr['Version'] = '1.0'
-        parser.start('BIXpy', attr)
-        parser.data('\r\n\t')
-        parser.start('UserOptions', dict())
-        parser.data('\r\n')
-        for option in self._options:
-            if self.debug:
-                print(option.Name)
-                print(option.Value)
-                print()
-            parser.data('\t\t')
-            name = option.Name.replace(' ', '_')
-            parser.start(name, dict())
-            parser.data(str(option.Value))
-            parser.end(name)
-            parser.data('\r\n')
-        parser.data('\t')
-        parser.end('UserOptions')
-        parser.data('\r\n')
-        parser.end('BIXpy')
-        tree = ET.ElementTree(parser.close())
-        tree.write(file_path)
-
-    def __str__(self):
-        first = True
-        text = '['
-        for option in self._options:
-            if first:
-                first = False
-            else:
-                text += ', '
-            text += str(option)
-        text += ']'
-        return text
 
 if __name__ == '__main__':
     opt = UserOptions()
