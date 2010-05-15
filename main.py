@@ -43,6 +43,7 @@ class Main:
         self.entry = ttk.Entry(self.root, textvariable = self.Text, width=90)
         self.entry.grid(column=2, row=0, sticky='e')
         self.txt = tkinter.Text(self.root, width=80, height=50)
+        self.txt.config(state = tkinter.DISABLED)
         self.txt.grid(column=0, row=1, columnspan=3, sticky='nwes')
         sb = ttk.Scrollbar(command=self.txt.yview, orient='vertical')
         sb.grid(column=3, row=1, sticky='ns')
@@ -158,7 +159,9 @@ class Main:
         self.logged_in = False
 
     def append(self, text):
+        self.txt.config(state = tkinter.NORMAL)
         self.txt.insert(tkinter.END, text)
+        self.txt.config(state = tkinter.DISABLED)
         self.txt.see(tkinter.END)
 
     def options(self):
