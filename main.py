@@ -82,8 +82,6 @@ class Main:
             if self.blink:
                 text += ';;-BLINK\r\n'
                 self.blink = False
-            if self.user.Echo_Output.Value:
-                print(text)
             try:
                 self.telnet.write(text.encode('ascii') + b'\r\n')
             except EOFError:
@@ -91,8 +89,11 @@ class Main:
                 return
             self.Text.set('')
             if self.pw:
-                self.append(b'*\r\n')
+                text = b'*\r\n'
+                self.append(text)
                 self.pw = False
+            if self.user.Echo_Output.Value:
+                print('-->', text)
 
     def process_telnet(self):
         response = ''
@@ -106,35 +107,42 @@ class Main:
                 return
             if text:
                 if self.user.Echo_Input.Value:
-                    print(text)
+                    print('<--', text)
                 self.append(text)
-                if not self.logged_in and text.endswith(b'\r\nLogin: '):
-                    response = b'nlz\r\n'
-                    show = response
-                elif not self.logged_in and text.endswith(b'Name? '):
-                    if self.user.Login_Name.Value:
-                        response = self.user.Login_Name.Value.encode('ascii') + b';;-BLINK\r\n'
-                    else:
+                if not self.logged_in:
+                    if text.endswith(b'\r\nLogin: '):
+                        response = b'nlz\r\n'
+                        show = response
+                    elif text.endswith(b'Name? '):
+                        if self.user.Login_Name.Value:
+                            response = self.user.Login_Name.Value.encode('ascii') + b';;-BLINK\r\n'
+                        else:
+                            self.root.initial_focus.focus_set()
+                            self.blink = True
+                    elif text.endswith(b'Password: '):
+                        if self.user.Login_Password.Value:
+                            response = self.user.Login_Password.Value.encode('ascii') + b'\r\n'
+                            show = b'*\r\n'
+                        else:
+                            self.pw = True
+                            self.root.initial_focus.focus_set()
+                    elif text.endswith(b'\r\n::: Ready!\r\n:'):
+                        self.logged_in = True
                         self.root.initial_focus.focus_set()
-                        self.blink = True
-                elif not self.logged_in and text.endswith(b'Password: '):
-                    if self.user.Login_Password.Value:
-                        response = self.user.Login_Password.Value.encode('ascii') + b'\r\n'
-                        show = b'*\r\n'
-                    else:
-                        self.pw = True
-                        self.root.initial_focus.focus_set()
-                elif not self.logged_in and text.endswith(b'\r\n::: Ready!\r\n:'):
-                    self.logged_in = True
-                    self.root.initial_focus.focus_set()
+                elif text.endswith(b'\x07Are you there? \r\n'):
+                    if self.user.Keep_Alive.Value:
+                        response = b'Yes\r\n'
                 if response:
-                    if self.user.Echo_Output.Value:
-                        print(response)
                     try:
                         self.telnet.write(response)
                     except EOFError:
                         self.show_disconnected()
                         return
+                    if self.user.Echo_Output.Value:
+                        if show:
+                            print('-->', show)
+                        else:
+                            print('-->', response)
                     response = ''
                 if show:
                     self.append(show)
