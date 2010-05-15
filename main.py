@@ -110,7 +110,9 @@ class Main:
                     else:
                         self.pw = True
                         self.root.initial_focus.focus_set()
-                elif not self.logged_in and text.endswith(b'\r\n::: Ready!\r\n'):
+                elif not self.logged_in and text.endswith(b'\r\n::: Ready!\r\n:'):
+                    if self.debug:
+                        print('Logged in!')
                     self.logged_in = True
                     self.root.initial_focus.focus_set()
                 if response:

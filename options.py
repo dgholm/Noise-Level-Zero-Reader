@@ -147,15 +147,30 @@ class Options:
         self.widget18c = ttk.Button(self.top, text='Cancel', command=self.cancel, width=10)
         self.widget18c.grid(column=1, row=17, sticky='e')
 
-    def ok(self, event = None):
+    def copy_instance_values(self):
         # copy the instance values back to the UserOptions object.
-        # close the dialog.
+        self.user.AutomaticWho.Value = self.AutomaticWho.get()
+        self.user.BlackHoleList.Value = self.BlackHoleListEntries
+        self.user.BrowserPath.Value = self.BrowserPath.get()
+        self.user.EchoInput.Value = self.EchoInput.get()
+        self.user.EchoOutput.Value = self.EchoOutput.get()
+        self.user.HostName.Value = self.HostName.get()
+        self.user.LoginName.Value = self.LoginName.get()
+        self.user.LoginPassword.Value = self.LoginPassword.get()
+        self.user.KeepAlive.Value = self.KeepAlive.get()
+        self.user.MailerPath.Value = self.MailerPath.get()
+        self.user.ReadMode.Value = self.ReadMode.get()
+        self.user.SystemType.Value = self.SystemType.get()
+        self.user.TraceEvents.Value = self.TraceEvents.get()
+        self.user.WordWrapAt72.Value = self.WordWrapAt72.get()
+
+    def ok(self, event = None):
+        self.copy_instance_values()
         self.cancel()
 
     def save(self, event = None):
-        # copy the instance values back to the UserOptions object.
-        # save the UserOptions.
-        # close the dialog.
+        self.copy_instance_values()
+        # save the values.
         self.cancel()
 
     def cancel(self, event = None):
