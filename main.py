@@ -47,7 +47,7 @@ class Main:
 
     def connect(self):
         if not self.connected:
-            self.insert('\nConnecting...')
+            self.append('\nConnecting...')
             self.root.update()
             if self.telnet:
                 self.telnet.close()
@@ -55,7 +55,7 @@ class Main:
             if not host:
                 host = 'nlzero.com'
             self.telnet = Telnet(host, 23, 60)
-            self.insert('\nConnected.\n')
+            self.append('\nConnected.\n')
             self.disc.grid(column=1, row=0, sticky='w')
             self.conn.grid_forget()
             self.connected = True
@@ -77,7 +77,7 @@ class Main:
                 return
             self.Text.set('')
             if self.pw:
-                self.insert(b'*\r\n')
+                self.append(b'*\r\n')
                 self.pw = False
 
     def process_telnet(self):
@@ -93,7 +93,7 @@ class Main:
             if text:
                 if self.debug:
                     print(text)
-                self.insert(text)
+                self.append(text)
                 if not self.logged_in and text.endswith(b'\r\nLogin: '):
                     response = b'nlz\r\n'
                     show = response
@@ -121,28 +121,29 @@ class Main:
                         return
                     response = ''
                 if show:
-                    self.insert(show)
+                    self.append(show)
                     show = ''
             self.root.update()
 
     def disconnect(self):
         if self.connected:
-            self.insert('\nDisconnecting...')
+            self.append('\nDisconnecting...')
             self.root.update()
             if self.telnet:
                 self.telnet.close()
                 self.telnet = None
-            show_disconnected()
+            self.show_disconnected()
 
     def show_disconnected(self):
-        self.insert('\nDisconnected.\n')
+        self.append('\nDisconnected.\n')
         self.conn.grid(column=1, row=0, sticky='w')
         self.disc.grid_forget()
         self.connected = False
         self.logged_in = False
 
-    def insert(self, text):
-        self.txt.insert(tkinter.INSERT, text)
+    def append(self, text):
+        self.txt.insert(tkinter.END, text)
+        self.txt.see(tkinter.END)
 
     def options(self):
         opt = Options(self.root, self.user)
