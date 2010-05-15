@@ -11,7 +11,6 @@ import re
 
 class Main:
     def __init__(self):
-        self.debug = False
         self.connected = False
         self.logged_in = False
         self.blink = False
@@ -83,7 +82,7 @@ class Main:
             if self.blink:
                 text += ';;-BLINK\r\n'
                 self.blink = False
-            if self.debug:
+            if self.user.Echo_Output.Value:
                 print(text)
             try:
                 self.telnet.write(text.encode('ascii') + b'\r\n')
@@ -106,7 +105,7 @@ class Main:
                 self.show_disconnected()
                 return
             if text:
-                if self.debug:
+                if self.user.Echo_Input.Value:
                     print(text)
                 self.append(text)
                 if not self.logged_in and text.endswith(b'\r\nLogin: '):
@@ -126,11 +125,11 @@ class Main:
                         self.pw = True
                         self.root.initial_focus.focus_set()
                 elif not self.logged_in and text.endswith(b'\r\n::: Ready!\r\n:'):
-                    if self.debug:
-                        print('Logged in!')
                     self.logged_in = True
                     self.root.initial_focus.focus_set()
                 if response:
+                    if self.user.Echo_Output.Value:
+                        print(response)
                     try:
                         self.telnet.write(response)
                     except EOFError:
