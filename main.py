@@ -42,7 +42,6 @@ class Main:
 
     def options(self):
         opt = Options(self.root, self.user)
-        self.root.wait_window(opt.root)
 
 if __name__ == '__main__':
     main = Main(None)

@@ -49,6 +49,9 @@ class Options:
         self.top.grab_set()
         self.top.initial_focus = self.top
         self.top.protocol("WM_DELETE_WINDOW", self.cancel)
+        self.top.geometry("+%d+%d" % (parent.winfo_rootx()+24, parent.winfo_rooty()+48))
+        self.top.bind("<Return>", self.ok)
+        self.top.bind("<Escape>", self.cancel)
         self.top.initial_focus = self.widget18c
         self.top.initial_focus.focus_set()
         self.top.wait_window(self.top)
@@ -137,14 +140,25 @@ class Options:
         self.label17 = ttk.Label(self.top, text=' ', width=self.min_left_width)
         self.label17.grid(column=0, row=16, sticky='w')
 
-        self.widget18a = ttk.Button(self.top, text='OK', width=10)
+        self.widget18a = ttk.Button(self.top, text='OK', command=self.ok, width=10)
         self.widget18a.grid(column=0, row=17, sticky='w')
-        self.widget18b = ttk.Button(self.top, text='Save', width=10)
+        self.widget18b = ttk.Button(self.top, text='Save', command=self.save, width=10)
         self.widget18b.grid(column=1, row=17, sticky='w')
         self.widget18c = ttk.Button(self.top, text='Cancel', command=self.cancel, width=10)
         self.widget18c.grid(column=1, row=17, sticky='e')
 
-    def cancel(self):
+    def ok(self, event = None):
+        # copy the instance values back to the UserOptions object.
+        # close the dialog.
+        self.cancel()
+
+    def save(self, event = None):
+        # copy the instance values back to the UserOptions object.
+        # save the UserOptions.
+        # close the dialog.
+        self.cancel()
+
+    def cancel(self, event = None):
         self.top.parent.focus_set()
         self.top.destroy()
 
@@ -153,4 +167,3 @@ if __name__ == '__main__':
     root = tkinter.Tk()
     root.update()
     opt = Options(root, user)
-    #root.wait_window(opt.top)
