@@ -2,29 +2,38 @@
 
 import tkinter
 from tkinter import ttk
+from tkinter import StringVar
 from options import Options
 from user_options import UserOptions
+from telnetlib import Telnet
 
 class Main:
-    def __init__(self, parent):
-        self.parent = parent
+    def __init__(self):
+        self.debug = False
+        self.connected = False
+        self.logged_in = False
+        self.blink = False
+        self.pw = False
         self.root = tkinter.Tk()
-        self.root.title('BIXjoe')
+        self.root.title('BIXpy')
+        self.Text = StringVar()
         self.init_widgets()
         self.root.protocol("WM_DELETE_WINDOW", self.cancel)
         self.root.geometry("+%d+%d" % (48, 48))
+        self.root.bind("<Return>", self.send_text)
         self.root.initial_focus = self.entry
         self.root.initial_focus.focus_set()
+        self.user = UserOptions()
+        self.telnet = None
         self.root.mainloop()
 
     def init_widgets(self):
-        self.user = UserOptions()
         self.options = ttk.Button(self.root, command=self.options, text="Options", width=12)
         self.options.grid(column=0, row=0, sticky='w')
-        self.connect = ttk.Button(self.root, command=self.connect, text='Connect', width=12)
-        self.disconnect = ttk.Button(self.root, command=self.disconnect, text='Disconnect', width=12)
-        self.connect.grid(column=1, row=0, sticky='w')
-        self.entry = ttk.Entry(self.root, width=90)
+        self.conn = ttk.Button(self.root, command=self.connect, text='Connect', width=12)
+        self.disc = ttk.Button(self.root, command=self.disconnect, text='Disconnect', width=12)
+        self.conn.grid(column=1, row=0, sticky='w')
+        self.entry = ttk.Entry(self.root, textvariable = self.Text, width=90)
         self.entry.grid(column=2, row=0, sticky='e')
         self.txt = tkinter.Text(self.root, width=80, height=50)
         self.txt.grid(column=0, row=1, columnspan=3, sticky='nwes')
@@ -33,18 +42,88 @@ class Main:
         self.txt['yscrollcommand'] = sb.set
 
     def cancel(self, event = None):
-        # check to see if still connected...
+        self.disconnect()
         self.root.destroy()
 
     def connect(self):
-        self.insert('Connecting...')
-        self.disconnect.grid(column=1, row=0, sticky='w')
-        self.connect.grid_forget()
+        if not self.connected:
+            self.insert('\nConnecting...')
+            self.root.update()
+            if self.telnet:
+                self.telnet.close()
+            host = self.user.HostName.Value
+            if not host:
+                host = 'nlzero.com'
+            self.telnet = Telnet(host, 23, 60)
+            self.insert('\nConnected.\n')
+            self.disc.grid(column=1, row=0, sticky='w')
+            self.conn.grid_forget()
+            self.connected = True
+            self.root.update()
+            self.process_telnet()
+
+    def send_text(self, event = None):
+        if self.telnet and self.connected:
+            text = self.Text.get()
+            if self.blink:
+                text += ';;-BLINK\r\n'
+                self.blink = False
+            if self.debug:
+                print(text)
+            self.telnet.write(text.encode('ascii') + b'\r\n')
+            self.Text.set('')
+            if self.pw:
+                self.insert(b'*\r\n')
+                self.pw = False
+
+    def process_telnet(self):
+        response = ''
+        show = ''
+        while self.telnet:
+            text = self.telnet.read_very_eager()
+            if text:
+                if self.debug:
+                    print(text)
+                self.insert(text)
+                if not self.logged_in and text.endswith(b'\r\nLogin: '):
+                    response = b'nlz\r\n'
+                    show = response
+                elif not self.logged_in and text.endswith(b'Name? '):
+                    if self.user.LoginName.Value:
+                        response = self.user.LoginName.Value.encode('ascii') + b';;-BLINK\r\n'
+                    else:
+                        self.root.initial_focus.focus_set()
+                        self.blink = True
+                elif not self.logged_in and text.endswith(b'Password: '):
+                    if self.user.LoginPassword.Value:
+                        response = self.user.LoginPassword.Value.encode('ascii') + b'\r\n'
+                        show = b'*\r\n'
+                    else:
+                        self.pw = True
+                        self.root.initial_focus.focus_set()
+                elif not self.logged_in and text.endswith(b'\r\n::: Ready!\r\n'):
+                    self.logged_in = True
+                    self.root.initial_focus.focus_set()
+                if response:
+                    self.telnet.write(response)
+                    response = ''
+                if show:
+                    self.insert(show)
+                    show = ''
+            self.root.update()
 
     def disconnect(self):
-        self.insert('Disconnecting...')
-        self.connect.grid(column=1, row=0, sticky='w')
-        self.disconnect.grid_forget()
+        if self.connected:
+            self.insert('\nDisconnecting...')
+            self.root.update()
+            if self.telnet:
+                self.telnet.close()
+                self.telnet = None
+            self.insert('\nDisconnected.\n')
+            self.conn.grid(column=1, row=0, sticky='w')
+            self.disc.grid_forget()
+            self.connected = False
+            self.logged_in = False
 
     def insert(self, text):
         self.txt.insert(tkinter.INSERT, text)
@@ -53,4 +132,4 @@ class Main:
         opt = Options(self.root, self.user)
 
 if __name__ == '__main__':
-    main = Main(None)
+    main = Main()
