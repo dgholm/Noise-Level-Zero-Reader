@@ -42,21 +42,20 @@ class Main:
         self.disc = ttk.Button(self.root, command=self.disconnect, text='Disconnect', width=12)
         self.conn.grid(column=1, row=0, sticky='w')
         self.entry = ttk.Entry(self.root, textvariable = self.Text, width=90)
-        self.entry.grid(column=2, row=0, sticky='e')
+        self.entry.grid(column=2, row=0, sticky='ew')
         self.txt = tkinter.Text(self.root, width=80, height=50)
         self.txt.config(state = tkinter.DISABLED)
         self.txt.grid(column=0, row=1, columnspan=3, sticky='nwes')
         sb = ttk.Scrollbar(command=self.txt.yview, orient='vertical')
         sb.grid(column=3, row=1, sticky='ns')
         self.txt['yscrollcommand'] = sb.set
+        self.root.grid_columnconfigure(2, weight=1)
+        self.root.grid_rowconfigure(1, weight=1)
 
     def cancel(self, event = None):
         self.disconnect()
-        geom = self.root.geometry()
-        m = re.match("(\d+)x(\d+)([-+]\d+)([-+]\d+)", geom)
-        if m:
-            vals = m.groups()
-            geom = "%s%s" % (vals[2], vals[3])
+        if self.root.state() == 'normal':
+            geom = self.root.geometry()
             self.prog.Main_Geometry.Value = geom
         self.prog.write('ProgramOptions')
         self.root.destroy()
