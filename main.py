@@ -156,6 +156,9 @@ class Main:
                             self.root.initial_focus.focus_set()
                     elif text.find(b'\r\n::: Ready!') >= 0:
                         self.logged_in = True
+                        if self.user.Read_Mode.Value:
+                            response = 'read ' + self.user.Read_Mode.Value + '\r\n'
+                            response = response.encode('ascii')
                         self.root.initial_focus.focus_set()
                 elif text.endswith(b'\x07Are you there? \r\n'):
                     if self.user.Keep_Alive.Value:
