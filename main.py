@@ -82,14 +82,10 @@ class Main:
         if self.telnet and self.connected:
             line = self.Text.get()
             org_len = len(line) + self.cur_len
-            print('len(line)', len(line))
-            print('self.cur_len', self.cur_len)
-            print('org_len', org_len)
             first_time = True
             while first_time or len(line) > 0:
                 first_time = False
                 if len(line) + self.cur_len > 72:
-                    print('needs wrapping')
                     idx = 72 - self.cur_len
                     while idx > 0 and not line[idx] in self.wrap_chars:
                         idx -= 1
@@ -101,7 +97,6 @@ class Main:
                             idx = 72 - self.cur_len
                     else:
                         idx += 1
-                    print('idx', idx)
                     text = line[0:idx] + '\r\n'
                     line = line[idx:]
                     self.cur_len = 0
@@ -113,7 +108,6 @@ class Main:
                     else:
                         self.cur_len = 0
                         text += '\r\n'
-                    print ('self.cur_len', self.cur_len)
                 if self.blink:
                     text += ';;-BLINK\r\n'
                     self.blink = False
@@ -127,7 +121,7 @@ class Main:
                     text = b'*\r\n'
                     self.append(text)
                     self.pw = False
-                if self.user.Echo_Output.Value:
+                if self.user.Echo_Output.Value == '1':
                     print('-->', text)
 
     def process_telnet(self):
@@ -141,7 +135,7 @@ class Main:
                 self.show_disconnected()
                 return
             if text:
-                if self.user.Echo_Input.Value:
+                if self.user.Echo_Input.Value == '1':
                     print('<--', text)
                 self.append(text)
                 if not self.logged_in:
@@ -173,7 +167,7 @@ class Main:
                     except EOFError:
                         self.show_disconnected()
                         return
-                    if self.user.Echo_Output.Value:
+                    if self.user.Echo_Output.Value == '1':
                         if show:
                             print('-->', show)
                         else:
