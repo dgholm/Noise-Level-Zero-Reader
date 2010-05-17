@@ -36,10 +36,10 @@ class Options:
         self.New_Black_Hole_Entry = StringVar()
         self.Read_Mode = StringVar()
         self.Read_Mode.set(self.user.Read_Mode.Value)
+        self.Show_New = StringVar()
+        self.Show_New.set(self.user.Show_New.Value)
         self.System_Type = StringVar()
         self.System_Type.set(self.user.System_Type.Value)
-        self.Trace_Events = StringVar()
-        self.Trace_Events.set(self.user.Trace_Events.Value)
         self.Word_Wrap_at_72 = StringVar()
         self.Word_Wrap_at_72.set(self.user.Word_Wrap_at_72.Value)
         self.left_width = 0
@@ -104,7 +104,7 @@ class Options:
 
         self.label10 = ttk.Label(self.top, text='', width=self.left_width)
         self.label10.grid(column=0, row=9, sticky='e')
-        self.widget10 = ttk.Checkbutton(self.top, text='Trace Events', variable=self.Trace_Events, width=self.right_width)
+        self.widget10 = ttk.Checkbutton(self.top, text='Show New', variable=self.Show_New, width=self.right_width)
         self.widget10.grid(column=1, row=9, sticky='w')
 
         self.label11 = ttk.Label(self.top, text='', width=self.left_width)
@@ -160,8 +160,8 @@ class Options:
         self.user.Keep_Alive.Value = self.Keep_Alive.get()
         self.user.Mailer_Path.Value = self.Mailer_Path.get()
         self.user.Read_Mode.Value = self.Read_Mode.get()
+        self.user.Show_New.Value = self.Show_New.get()
         self.user.System_Type.Value = self.System_Type.get()
-        self.user.Trace_Events.Value = self.Trace_Events.get()
         self.user.Word_Wrap_at_72.Value = self.Word_Wrap_at_72.get()
 
     def ok(self, event = None):

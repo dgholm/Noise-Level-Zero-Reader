@@ -42,9 +42,9 @@ class UserOptions(OptionsBase):
         self.System_Type = Option(
             'System Type', 'choice', ['NLZ', 'other', 'test'], '')
         options.append(self.System_Type)
-        self.Trace_Events = Option(
-            'Trace Events', 'boolean', None, '0')
-        options.append(self.Trace_Events)
+        self.Show_New = Option(
+            'Show New', 'boolean', None, '0')
+        options.append(self.Show_New)
         self.Word_Wrap_at_72 = Option(
             'Word Wrap At 72', 'boolean', None, '1')
         options.append(self.Word_Wrap_at_72)

@@ -158,7 +158,14 @@ class Main:
                         self.logged_in = True
                         if self.user.Read_Mode.Value:
                             response = 'read ' + self.user.Read_Mode.Value + '\r\n'
-                            response = response.encode('ascii')
+                        else:
+                            response = ''
+                        if self.user.Show_New.Value == '1':
+                            if len(response) > 0:
+                                response = 'show new; ' + response
+                            else:
+                                response = 'show new\r\n'
+                        response = response.encode('ascii')
                         self.root.initial_focus.focus_set()
                 elif text.endswith(b'\x07Are you there? \r\n'):
                     if self.user.Keep_Alive.Value:
