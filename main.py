@@ -32,7 +32,7 @@ class Main:
         self.user = UserOptions()
         self.user.read('UserOptions')
         self.telnet = None
-        self.wrap_chars = ' ,;:/\\]})=-+'
+        self.wrap_chars = ' ,;:/\\]})=-+\n'
         self.root.mainloop()
 
     def init_widgets(self):
@@ -79,7 +79,13 @@ class Main:
 
     def send_text(self, event = None):
         if self.telnet and self.connected:
-            line = self.Text.get()
+            line = self.Text.get().replace('\r\n', '\n').replace('\n\r', '\n').replace('\r', '\n')
+            i = 0;
+            while i < len(line):
+                if line[i:i+1] > '~':
+                    line = line[:i] + line[i+1:]
+                else:
+                    i += 1
             org_len = len(line) + self.cur_len
             first_time = True
             while first_time or len(line) > 0:
@@ -96,13 +102,26 @@ class Main:
                             idx = 72 - self.cur_len
                     else:
                         idx += 1
+                    nl_idx = line.find('\n')
+                    if nl_idx >= 0 and nl_idx < idx:
+                        idx = nl_idx
+                        found_nl = True
+                    else:
+                        found_nl = False
                     text = line[0:idx] + '\r\n'
+                    if found_nl:
+                        idx += 1
                     line = line[idx:]
                     self.cur_len = 0
                 else:
                     text = line
-                    line = ''
-                    if org_len > 72:
+                    nl_idx = text.find('\n')
+                    if nl_idx < 0:
+                        line = ''
+                    else:
+                        text = line[0:nl_idx]
+                        line = line[nl_idx + 1:]
+                    if org_len > 72 or nl_idx >= 0:
                         self.cur_len = len(text)
                     else:
                         self.cur_len = 0
