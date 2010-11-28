@@ -1,5 +1,6 @@
 # vim:tabstop=8:shiftwidth=4:smarttab:expandtab:softtabstop=4:autoindent:
 
+import codecs
 import tkinter
 from tkinter import ttk
 from tkinter import StringVar
@@ -13,6 +14,7 @@ class Main:
     def __init__(self):
         self.connected = False
         self.logged_in = False
+        self.utf8 = codecs.lookup('utf-8')
         self.blink = False
         self.cur_len = 0
         self.pw = False
@@ -80,12 +82,6 @@ class Main:
     def send_text(self, event = None):
         if self.telnet and self.connected:
             line = self.Text.get().replace('\r\n', '\n').replace('\n\r', '\n').replace('\r', '\n')
-            i = 0;
-            while i < len(line):
-                if line[i:i+1] > '~':
-                    line = line[:i] + line[i+1:]
-                else:
-                    i += 1
             org_len = len(line) + self.cur_len
             first_time = True
             while first_time or len(line) > 0:
@@ -130,7 +126,8 @@ class Main:
                     text += ';;-BLINK\r\n'
                     self.blink = False
                 try:
-                    self.telnet.write(text.encode('ascii'))
+                    bytes = self.utf8.encode(text)[0]
+                    self.telnet.write(bytes)
                 except EOFError:
                     self.show_disconnected()
                     return
@@ -148,32 +145,33 @@ class Main:
         while self.telnet:
             text = None
             try:
-                text = self.telnet.read_very_eager()
+                bytes = self.telnet.read_very_eager()
             except EOFError:
                 self.show_disconnected()
                 return
-            if text:
+            if bytes:
                 if self.user.Echo_Input.Value == '1':
-                    print('<--', text)
+                    print('<--', bytes)
+                text = self.utf8.decode(bytes, 'replace')[0]
                 self.append(text)
                 if not self.logged_in:
-                    if text.endswith(b'\r\nLogin: '):
+                    if bytes.endswith(b'\r\nLogin: '):
                         response = b'nlz\r\n'
                         show = response
-                    elif text.endswith(b'Name? '):
+                    elif bytes.endswith(b'Name? '):
                         if self.user.Login_Name.Value:
-                            response = self.user.Login_Name.Value.encode('ascii') + b';;-BLINK\r\n'
+                            response = self.user.Login_Name.Value.encode('utf-8') + b';;-BLINK\r\n'
                         else:
                             self.root.initial_focus.focus_set()
                             self.blink = True
-                    elif text.endswith(b'Password: '):
+                    elif bytes.endswith(b'Password: '):
                         if self.user.Login_Password.Value:
-                            response = self.user.Login_Password.Value.encode('ascii') + b'\r\n'
+                            response = self.user.Login_Password.Value.encode('utf-8') + b'\r\n'
                             show = b'*\r\n'
                         else:
                             self.pw = True
                             self.root.initial_focus.focus_set()
-                    elif text.find(b'\r\n::: Ready!') >= 0:
+                    elif bytes.find(b'\r\n::: Ready!') >= 0:
                         self.logged_in = True
                         if self.user.Read_Mode.Value:
                             response = 'read ' + self.user.Read_Mode.Value + '\r\n'
@@ -184,9 +182,9 @@ class Main:
                                 response = 'show new; ' + response
                             else:
                                 response = 'show new\r\n'
-                        response = response.encode('ascii')
+                        response = response.encode('utf-8')
                         self.root.initial_focus.focus_set()
-                elif text.endswith(b'\x07Are you there? \r\n'):
+                elif bytes.endswith(b'\x07Are you there? \r\n'):
                     if self.user.Keep_Alive.Value:
                         response = b'Yes\r\n'
                 if response:
