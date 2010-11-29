@@ -8,12 +8,14 @@ from options import Options
 from program_options import ProgramOptions
 from user_options import UserOptions
 from telnetlib import Telnet
+from telnetlib import BINARY, DO, DONT, IAC, WILL, WONT
 import re
 
 class Main:
     def __init__(self):
         self.connected = False
         self.logged_in = False
+        self.negotiating = False
         self.utf8 = codecs.lookup('utf-8')
         self.blink = False
         self.cur_len = 0
@@ -72,6 +74,7 @@ class Main:
             if not host:
                 host = 'nlzero.com'
             self.telnet = Telnet(host, 23, 60)
+            self.telnet.set_option_negotiation_callback(self.telnet_negotiate)
             self.append('\nConnected.\n')
             self.disc.grid(column=1, row=0, sticky='w')
             self.conn.grid_forget()
@@ -127,6 +130,7 @@ class Main:
                     self.blink = False
                 try:
                     bytes = self.utf8.encode(text)[0]
+                    #print(bytes)
                     self.telnet.write(bytes)
                 except EOFError:
                     self.show_disconnected()
@@ -228,6 +232,113 @@ class Main:
 
     def options(self):
         opt = Options(self.root, self.user)
+
+    def telnet_negotiate(self, sock, command, option):
+        #
+        # I found the source for this method on the web and made some
+        # changes to it for my use in BIXpy:
+        #
+        # http://www.velocityreviews.com/forums/
+        # t342450-usage-example-for-ansi-py-from-the-pexpect-package.html
+        #
+        # Here's a function I came up with to handle sub-negotiation.
+        # During session negotiation, the server can ask a series of
+        # "will you or won't you" questions of the client. One of
+        # those questions happens to be:
+        # "Will you tell me what terminal type you are?"
+        # This question is the only one out of the possible list of
+        # such questions that I respond with "Yes, I will." Then later
+        # the function reports that the terminal type is a DEC VT-100.
+        # If you don't do the sub-negotiation and the server demands
+        # to know the terminal type, the Telnet function will report
+        # that the terminal type is simply "network". No server will
+        # recognize this, and some will refuse to even start a session
+        # with you using some default terminal type.
+        # A couple of good links--
+        # http://www.cs.cf.ac.uk/Dave/Internet/node136.html
+        # http://www.scit.wlv.ac.uk/rfc/rfc8xx/RFC854.html
+        #
+        negotiation_list=[
+            ['BINARY',WILL,'WONT'],
+            ['ECHO',WONT,'WONT'],
+            ['RCP',WONT,'WONT'],
+            ['SGA',WONT,'WONT'],
+            ['NAMS',WONT,'WONT'],
+            ['STATUS',WONT,'WONT'],
+            ['TM',WONT,'WONT'],
+            ['RCTE',WONT,'WONT'],
+            ['NAOL',WONT,'WONT'],
+            ['NAOP',WONT,'WONT'],
+            ['NAOCRD',WONT,'WONT'],
+            ['NAOHTS',WONT,'WONT'],
+            ['NAOHTD',WONT,'WONT'],
+            ['NAOFFD',WONT,'WONT'],
+            ['NAOVTS',WONT,'WONT'],
+            ['NAOVTD',WONT,'WONT'],
+            ['NAOLFD',WONT,'WONT'],
+            ['XASCII',WONT,'WONT'],
+            ['LOGOUT',WONT,'WONT'],
+            ['BM',WONT,'WONT'],
+            ['DET',WONT,'WONT'],
+            ['SUPDUP',WONT,'WONT'],
+            ['SUPDUPOUTPUT',WONT,'WONT'],
+            ['SNDLOC',WONT,'WONT'],
+            ['TTYPE',WONT,'WONT'],
+            ['EOR',WONT,'WONT'],
+            ['TUID',WONT,'WONT'],
+            ['OUTMRK',WONT,'WONT'],
+            ['TTYLOC',WONT,'WONT'],
+            ['VT3270REGIME',WONT,'WONT'],
+            ['X3PAD',WONT,'WONT'],
+            ['NAWS',WONT,'WONT'],
+            ['TSPEED',WONT,'WONT'],
+            ['LFLOW',WONT,'WONT'],
+            ['LINEMODE',WONT,'WONT'],
+            ['XDISPLOC',WONT,'WONT'],
+            ['OLD_ENVIRON',WONT,'WONT'],
+            ['AUTHENTICATION',WONT,'WONT'],
+            ['ENCRYPT',WONT,'WONT'],
+            ['NEW_ENVIRON',WONT,'WONT']
+        ]
+        if ord(option)<40:
+            received_option=negotiation_list[ord(option)][0]
+            response=negotiation_list[ord(option)][1]
+            print_response=negotiation_list[ord(option)][2]
+        else:
+            received_option='unrecognised'
+            response=WONT
+            print_response='WONT'
+        if command==DO:
+            print("Received request to DO %s, sending %s" % \
+            (received_option,print_response))
+            #print(IAC, response, option)
+            sock.sendall(IAC)
+            sock.sendall(response)
+            sock.sendall(option)
+        elif command==DONT:
+            print('Received the DONT %s command' %(received_option))
+        elif command==WILL:
+            print('Received the WILL %s command' %(received_option))
+        elif command==WONT:
+            print('Received the WONT %s command' %(received_option))
+        elif command==theNULL:
+            print('Received the NULL command')
+        elif command==SB:
+            print('Received the SB command')
+            print(ord(option))
+            print(self.conn.read_sb_data())
+        elif command==SE:
+            print('Received the SE command')
+        else:
+            print('Received something, don''t know what.')
+            print(ord(option))
+        if not self.negotiating:
+            print('Sending the DO BINARY command')
+            self.negotiating = True
+            sock.sendall(IAC)
+            sock.sendall(DO)
+            sock.sendall(BINARY)
+        return
 
 if __name__ == '__main__':
     main = Main()
