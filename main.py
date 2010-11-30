@@ -107,7 +107,7 @@ class Main:
                         found_nl = True
                     else:
                         found_nl = False
-                    text = line[0:idx] + '\r\n'
+                    text = line[0:idx] + '\n'
                     if found_nl:
                         idx += 1
                     line = line[idx:]
@@ -124,20 +124,21 @@ class Main:
                         self.cur_len = len(text)
                     else:
                         self.cur_len = 0
-                        text += '\r\n'
+                        text += '\n'
                 if self.blink:
-                    text += ';;-BLINK\r\n'
+                    text += ';;-BLINK\n'
                     self.blink = False
                 try:
                     bytes = self.utf8.encode(text)[0]
-                    #print(bytes)
+                    if self.user.Echo_Output.Value == '1':
+                        print('-->', bytes)
                     self.telnet.write(bytes)
                 except EOFError:
                     self.show_disconnected()
                     return
                 self.Text.set('')
                 if self.pw:
-                    text = b'*\r\n'
+                    text = b'*\n'
                     self.append(text)
                     self.pw = False
                 if self.user.Echo_Output.Value == '1':
@@ -333,10 +334,13 @@ class Main:
             print('Received something, don''t know what.')
             print(ord(option))
         if not self.negotiating:
-            print('Sending the DO BINARY command')
+            print('Sending the WILL BINARY and DO BINARY commands')
             self.negotiating = True
             sock.sendall(IAC)
             sock.sendall(DO)
+            sock.sendall(BINARY)
+            sock.sendall(IAC)
+            sock.sendall(WILL)
             sock.sendall(BINARY)
         return
 
