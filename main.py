@@ -260,7 +260,7 @@ class Main:
         # http://www.scit.wlv.ac.uk/rfc/rfc8xx/RFC854.html
         #
         negotiation_list=[
-            ['BINARY',WILL,'WONT'],
+            ['BINARY',WILL,'WILL'],
             ['ECHO',WONT,'WONT'],
             ['RCP',WONT,'WONT'],
             ['SGA',WONT,'WONT'],
@@ -337,10 +337,10 @@ class Main:
             print('Sending the WILL BINARY and DO BINARY commands')
             self.negotiating = True
             sock.sendall(IAC)
-            sock.sendall(DO)
+            sock.sendall(WILL)
             sock.sendall(BINARY)
             sock.sendall(IAC)
-            sock.sendall(WILL)
+            sock.sendall(DO)
             sock.sendall(BINARY)
         return
 
