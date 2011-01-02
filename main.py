@@ -161,17 +161,17 @@ class Main:
                 self.append(text)
                 if not self.logged_in:
                     if bytes.endswith(b'\r\nLogin: '):
-                        response = b'nlz\r\n'
+                        response = b'nlz\n'
                         show = response
                     elif bytes.endswith(b'Name? '):
                         if self.user.Login_Name.Value:
-                            response = self.user.Login_Name.Value.encode('utf-8') + b';;-BLINK\r\n'
+                            response = self.user.Login_Name.Value.encode('utf-8') + b';;-BLINK\n'
                         else:
                             self.root.initial_focus.focus_set()
                             self.blink = True
                     elif bytes.endswith(b'Password: '):
                         if self.user.Login_Password.Value:
-                            response = self.user.Login_Password.Value.encode('utf-8') + b'\r\n'
+                            response = self.user.Login_Password.Value.encode('utf-8') + b'\n'
                             show = b'*\r\n'
                         else:
                             self.pw = True
@@ -179,19 +179,19 @@ class Main:
                     elif bytes.find(b'\r\n::: Ready!') >= 0:
                         self.logged_in = True
                         if self.user.Read_Mode.Value:
-                            response = 'read ' + self.user.Read_Mode.Value + '\r\n'
+                            response = 'read ' + self.user.Read_Mode.Value + '\n'
                         else:
                             response = ''
                         if self.user.Show_New.Value == '1':
                             if len(response) > 0:
                                 response = 'show new; ' + response
                             else:
-                                response = 'show new\r\n'
+                                response = 'show new\n'
                         response = response.encode('utf-8')
                         self.root.initial_focus.focus_set()
                 elif bytes.endswith(b'\x07Are you there? \r\n'):
                     if self.user.Keep_Alive.Value:
-                        response = b'Yes\r\n'
+                        response = b'Yes\n'
                 if response:
                     try:
                         self.telnet.write(response)
