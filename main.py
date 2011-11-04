@@ -91,7 +91,8 @@ class Main:
                 first_time = False
                 if len(line) + self.cur_len > 72:
                     idx = 72 - self.cur_len
-                    while idx > 0 and not line[idx] in self.wrap_chars:
+                    while idx > 0 and ((not line[idx] in self.wrap_chars) or \
+                            ((idx + 1 < len(line)) and (line[idx + 1] == '.'))):
                         idx -= 1
                     if idx == 0:
                         if self.cur_len > 0:
