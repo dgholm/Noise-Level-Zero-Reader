@@ -1,6 +1,7 @@
 # vim:tabstop=8:shiftwidth=4:smarttab:expandtab:softtabstop=4:autoindent:
 
 import codecs
+import re
 import tkinter
 from tkinter import ttk
 from tkinter import StringVar
@@ -9,7 +10,7 @@ from program_options import ProgramOptions
 from user_options import UserOptions
 from telnetlib import Telnet
 from telnetlib import BINARY, DO, DONT, IAC, WILL, WONT
-import re
+import webbrowser
 
 class Main:
     def __init__(self):
@@ -50,6 +51,9 @@ class Main:
         self.txt = tkinter.Text(self.root, width=80, height=50)
         self.txt.config(state = tkinter.DISABLED)
         self.txt.grid(column=0, row=1, columnspan=3, sticky='nwes')
+        self.txt.bind('<Button-1>', self.single_click)
+        self.txt.bind('<Double-1>', self.double_click)
+        self.txt.bind_all('<<Selection>>', self.launch_web)
         sb = ttk.Scrollbar(command=self.txt.yview, orient='vertical')
         sb.grid(column=3, row=1, sticky='ns')
         self.txt['yscrollcommand'] = sb.set
@@ -81,6 +85,22 @@ class Main:
             self.connected = True
             self.root.update()
             self.process_telnet()
+
+    def single_click(self, event):
+        self.d_click = False
+
+    def double_click(self, event):
+        self.d_click = True
+
+    def launch_web(self, event):
+        if self.d_click:
+            try:
+                text = event.widget.get('sel.first', 'sel.last')
+            except:
+                text = None
+            print(text)
+            if text:
+                webbrowser.open(text)
 
     def send_text(self, event = None):
         if self.telnet and self.connected:
